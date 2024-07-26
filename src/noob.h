@@ -6,6 +6,16 @@
 #include <string.h>
 #include <sys/stat.h>
 
+// Check Flags
+
+int HasFlag(int argc, const char **argv, const char *flag) {
+  for (int i = 0; i < argc; i++) {
+    if (strcmp(argv[i], flag) == 0)
+      return 1;
+  }
+  return 0;
+}
+
 // Build System
 
 typedef struct BuildCommand {
@@ -32,22 +42,22 @@ BuildCommand *CreateBuildCommand(size_t commandLength) {
   return bc;
 }
 
-void AddCommand(BuildCommand *bc, char *cmd) {
+void AddCommand(BuildCommand *bc, const char *cmd) {
   size_t alen = strlen(cmd);
   size_t blen = strlen(bc->command);
 
-  if (alen + blen > bc->length) {
+  if (alen + blen + 1 > bc->length) {
     printf("Command to long.\n");
     exit(1);
   }
   strcat(bc->command, cmd);
+  strcat(bc->command, " ");
 }
 
 int RunCommand(BuildCommand *bc) {
   int result = system(bc->command);
 
   if (result == 0) {
-    printf("Build successful.\n");
     return 0;
   } else {
     printf("Build failed.\n");
@@ -101,14 +111,21 @@ int nb_Recompile() {
   }
 }
 
-void RebuildYourself() {
+void RebuildYourself(int argc, const char **argv) {
   int source = nb_GetLastModified("noob.c");
   int exec = nb_GetLastModified("noob");
 
   if (source > exec) {
     printf("Rebuilding\n");
     if (nb_Recompile() == 0) {
-      system("./noob");
+      BuildCommand *bc = CreateBuildCommand(128);
+
+      for (int i = 0; i < argc; i++)
+        AddCommand(bc, argv[i]);
+
+      RunCommand(bc);
+
+      FreeBuildCommand(bc);
       exit(0);
     }
     exit(1);

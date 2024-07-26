@@ -8,8 +8,8 @@ inspired by tsodings [nob](https://github.com/tsoding/nobuild) in name and idea.
 // noob.c
 #include "noob.h"
 
-int main() {
-  RebuildYourself();
+int main(int argc, const char * argv) {
+  RebuildYourself(argc, argv);
   
   BuildCommand *bc = CreateBuildCommand(128);
   // do all your build logic here
@@ -35,4 +35,24 @@ rebuild yourself step:
 
 executing the build system will rebuild itself if needed, after a first compilation, no manual recompilation is needed.
 
-any changes made to the noob.c file will automatically be build and then executed. 
+any changes made to the noob.c file will automatically be build and then executed, argc and argv are passed along aswell. 
+
+## additional features
+
+to make life a bit easier when constructing your build i also implemented functions that might help you do just that.
+
+**HasFlag()**
+```C
+int main(int argc, const char **argv) {
+  RebuildYourself(argc, argv);
+
+  if (HasFlag(argc, argv, "DEBUG")) {
+    printf("Debug build\n");
+    // do some stuff here //
+  } else {
+    // do some other stuff here // 
+  }
+  // maybe even do some stuff here // 
+}
+```
+
