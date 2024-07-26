@@ -3,6 +3,8 @@ no (original) build. bootstrapped build system in c.
 
 inspired by tsodings [nob](https://github.com/tsoding/nobuild) in name and idea.
 
+i have been using it myself in my [balls-io](https://github.com/nailuj05/balls-io) game.
+
 ## example
 ```C
 // noob.c
