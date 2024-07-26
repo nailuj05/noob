@@ -60,15 +60,26 @@ int RunCommand(BuildCommand *bc) {
   if (result == 0) {
     return 0;
   } else {
-    printf("Build failed.\n");
+    printf("Command failed.\n");
     return 1;
   }
 }
 
-void FreeBuildCommand(BuildCommand *bc) {
+void FreeCommand(BuildCommand *bc) {
   if (bc != NULL) {
     free(bc->command);
     free(bc);
+  }
+}
+
+int BuildAndRunCommand(const char *cmd) {
+  int result = system(cmd);
+
+  if (result == 0) {
+    return 0;
+  } else {
+    printf("Command failed.\n");
+    return 1;
   }
 }
 
@@ -125,7 +136,7 @@ void RebuildYourself(int argc, const char **argv) {
 
       RunCommand(bc);
 
-      FreeBuildCommand(bc);
+      FreeCommand(bc);
       exit(0);
     }
     exit(1);
