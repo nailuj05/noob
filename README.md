@@ -42,6 +42,7 @@ any changes made to the noob.c file will automatically be build and then execute
 to make life a bit easier when constructing your build i also implemented functions that might help you do just that.
 
 **HasFlag()**
+detects whether a flag (`./noob DEBUG`) was passed.
 ```C
 int main(int argc, const char **argv) {
   RebuildYourself(argc, argv);
