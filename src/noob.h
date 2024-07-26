@@ -3,11 +3,59 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <sys/stat.h>
+
+// Build System
 
 typedef struct BuildCommand {
   char *command;
+  size_t length;
 } BuildCommand;
+
+BuildCommand *CreateBuildCommand(size_t commandLength) {
+  BuildCommand *bc = (BuildCommand *)malloc(sizeof(BuildCommand));
+  if (bc == NULL) {
+    printf("buy more ram\n");
+    exit(1);
+  }
+
+  bc->command = (char *)malloc(sizeof(char) * commandLength);
+
+  if (bc == NULL) {
+    printf("buy more ram\n");
+    exit(1);
+  }
+
+  bc->length = commandLength;
+
+  return bc;
+}
+
+void AddCommand(BuildCommand *bc, char *cmd) {
+  size_t alen = strlen(cmd);
+  size_t blen = strlen(bc->command);
+
+  if (alen + blen > bc->length) {
+    printf("Command to long.\n");
+    exit(1);
+  }
+  strcat(bc->command, cmd);
+}
+
+int RunCommand(BuildCommand *bc) {
+  int result = system(bc->command);
+
+  if (result == 0) {
+    printf("Build successful.\n");
+    return 0;
+  } else {
+    printf("Build failed.\n");
+    return 1;
+  }
+}
+
+// RebuildYourself
 
 int nb_GetLastModified(const char *filepath) {
   struct stat file_stat;
@@ -44,7 +92,6 @@ int nb_Recompile() {
     printf("Compilation failed.\n");
     return 1;
   }
-  return 0;
 }
 
 void RebuildYourself() {
