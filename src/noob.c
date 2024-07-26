@@ -12,5 +12,7 @@ int main() {
 
   RunCommand(bc);
 
+  FreeBuildCommand(bc);
+
   return 0;
 }

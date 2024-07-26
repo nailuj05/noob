@@ -55,6 +55,13 @@ int RunCommand(BuildCommand *bc) {
   }
 }
 
+void FreeBuildCommand(BuildCommand *bc) {
+  if (bc != NULL) {
+    free(bc->command);
+    free(bc);
+  }
+}
+
 // RebuildYourself
 
 int nb_GetLastModified(const char *filepath) {
