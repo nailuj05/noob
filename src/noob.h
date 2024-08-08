@@ -58,6 +58,7 @@ int RunCommand(BuildCommand *bc) {
   int result = system(bc->command);
 
   if (result == 0) {
+    printf("Command executed.\n");
     return 0;
   } else {
     printf("Command failed.\n");
