@@ -15,7 +15,7 @@ int main(int argc, const char **argv) {
 
   RunCommand(bc);
 
-  FreeBuildCommand(bc);
+  FreeCommand(bc);
 
   return 0;
 }
