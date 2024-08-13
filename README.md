@@ -17,7 +17,7 @@ int main(int argc, const char * argv) {
   // do all your build logic here
   AddCommand(bc, "gcc main.c -o main");
   RunCommand(bc);
-  FreeBuildCommand(bc);
+  FreeCommand(bc);
 
   return 0;
 }
