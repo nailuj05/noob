@@ -11,7 +11,12 @@ noob="noob.h"
 
 if [[ -f "$sdir/$noob" ]]; then
 		cp "$sdir/$noob" "$cdir/$noob"
+<<<<<<< HEAD
 		echo "added noob.h to $cdir"
+=======
+		touch "noob.c"
+		echo "added noob to $cdir"
+>>>>>>> 5656a1e (added sh script you can use to easily add noob to your projects)
 else
 		echo "noob.h not found in $cdir"
 fi
