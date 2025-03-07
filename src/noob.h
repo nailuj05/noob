@@ -19,72 +19,76 @@ int	noob_has_flag(int argc, const char **argv, const char *flag) {
 
 // Build System
 
-typedef struct noob_buildcommand_s {
-  char *command;
+typedef struct noob_build_cmd_s {
+  char *cmd;
   size_t length;
-} noob_build_command;
+} noob_cmd;
 
-noob_build_command *noob_create_build_command(size_t commandLength) {
-  noob_build_command *bc = (noob_build_command *)malloc(sizeof(noob_build_command));
+noob_cmd *noob_create_build_cmd(size_t cmdLength) {
+  noob_cmd *bc = (noob_cmd *)malloc(sizeof(noob_cmd));
   if (bc == NULL) {
     printf("[err] buy more ram\n");
     exit(1);
   }
 
-  bc->command = (char *)malloc(sizeof(char) * commandLength);
+  bc->cmd = (char *)malloc(sizeof(char) * cmdLength);
 
   if (bc == NULL) {
     printf("[err] buy more ram\n");
     exit(1);
   }
 
-  bc->length = commandLength;
+  bc->length = cmdLength;
 
   return bc;
 }
 
-void noob_add_command(noob_build_command *bc, const char *cmd) {
+void noob_add_cmd(noob_cmd *bc, const char *cmd) {
   size_t alen = strlen(cmd);
-  size_t blen = strlen(bc->command);
+  size_t blen = strlen(bc->cmd);
 
   if (alen + blen + 1 > bc->length) {
 		size_t new_size = (alen + blen) * 2;
-		char* t = realloc(bc->command, new_size);
+		char* t = realloc(bc->cmd, new_size);
 		if(t) {
-			bc->command = t;
+			bc->cmd = t;
 		} else {
 			printf("[err] buy more ram\n");
 			exit(1);
 		}
   }
-  strcat(bc->command, cmd);
-  strcat(bc->command, " ");
+  strcat(bc->cmd, cmd);
+  strcat(bc->cmd, " ");
 }
 
-int noob_run_command(noob_build_command *bc) {
-  int result = system(bc->command);
+int noob_run_cmd(noob_cmd *bc) {
+	printf("[cmd] %s\n", bc->cmd);
+  int result = system(bc->cmd);
 
   if (result == 0) {
-    printf("[info] command executed.\n");
+    printf("[info] cmd executed.\n");
     return 0;
   } else {
-    printf("[err] command failed.\n");
+    printf("[err] cmd failed.\n");
     return 1;
   }
 }
 
-void * noob_run_command_v(void *bc) {
-  int result = system(((noob_build_command*)bc)->command);
+void * noob_run_cmd_v(void *p) {
+	noob_cmd *bc = (noob_cmd*)p;
+	
+	printf("[cmd] %s\n", bc->cmd);
+  int result = system(bc->cmd);
 
   if (result == 0) {
-    printf("[info] async command %lu executed.\n", pthread_self());
+    printf("[info] async cmd executed.\n");
   } else {
-    printf("[err] command failed.\n");
+    printf("[err] cmd failed.\n");
   }
 	return NULL;
 }
 
-void* noob_run_command_async(noob_build_command *bc) {
+void* noob_run_cmd_async(noob_cmd *bc) {
 	pthread_t *t = (pthread_t *)malloc(sizeof(pthread_t));
 
 	if(t == NULL) {
@@ -92,7 +96,7 @@ void* noob_run_command_async(noob_build_command *bc) {
 		exit(1);
 	}
 
-	int res = pthread_create(t, NULL, noob_run_command_v, bc);
+	int res = pthread_create(t, NULL, noob_run_cmd_v, bc);
 
 	if (res != 0) {
 		printf("[err] thread error encountered with code %d\n", res);
@@ -105,12 +109,12 @@ void* noob_run_command_async(noob_build_command *bc) {
 void noob_join_async(void* t) {
 	pthread_join(*(pthread_t *)t, NULL);
 	free(t);
-	printf("[info] async command joined\n");
+	printf("[info] async cmd joined\n");
 }
 
-void noob_free_command(noob_build_command *bc) {
+void noob_free_cmd(noob_cmd *bc) {
   if (bc != NULL) {
-    free(bc->command);
+    free(bc->cmd);
     free(bc);
   }
 }
@@ -121,7 +125,7 @@ int noob_build_n_run(const char *cmd) {
   if (result == 0) {
     return 0;
   } else {
-    printf("[err] command failed.\n");
+    printf("[err] cmd failed.\n");
     return 1;
   }
 }
@@ -146,7 +150,7 @@ int noob_is_outdated(const char *file_a, const char *file_b) {
 }
 
 int noob_recomp() {
-  char command[256];
+  char cmd[256];
 
   if ((system("cc -fsyntax-only noob.c noob.h")) != 0) {
     printf("[info] recompilation failed due to errors.\n");
@@ -158,9 +162,9 @@ int noob_recomp() {
     return 0;
   }
 
-  snprintf(command, sizeof(command), "cc noob.c noob.h -o noob -lpthread");
+  snprintf(cmd, sizeof(cmd), "cc noob.c noob.h -o noob -lpthread");
 
-  int result = system(command);
+  int result = system(cmd);
 
   if (result == 0) {
     printf("[info] compilation successful.\n");
@@ -176,14 +180,14 @@ void noob_rebuild_yourself(int argc, const char **argv) {
 			noob_is_outdated("noob.h", "noob")) {
     printf("[info] rebuilding...\n");
     if (noob_recomp() == 0) {
-      noob_build_command *bc = noob_create_build_command(128);
+      noob_cmd *bc = noob_create_build_cmd(128);
 
       for (int i = 0; i < argc; i++)
-        noob_add_command(bc, argv[i]);
+        noob_add_cmd(bc, argv[i]);
 
-      noob_run_command(bc);
+      noob_run_cmd(bc);
 
-      noob_free_command(bc);
+      noob_free_cmd(bc);
       exit(0);
     }
     exit(1);
