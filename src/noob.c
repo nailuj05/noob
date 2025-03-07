@@ -9,9 +9,7 @@ int main(int argc, const char **argv) {
 
   noob_cmd *bc = noob_create_build_cmd(12);
   noob_add_cmd(bc, "echo");
-  noob_add_cmd(
-      bc,
-      "\"hey noob, this is where you would construct your build cmds\"");
+  noob_add_cmd(bc, "\"hey noob, this is where you would construct your build cmds\"");
 	
   void *t = noob_run_cmd_async(bc);
 
