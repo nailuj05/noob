@@ -1,5 +1,8 @@
 src/noob
 
+*.*~
+.projectile
+
 # Prerequisites
 *.d
 
