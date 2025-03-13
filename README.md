@@ -8,7 +8,7 @@ inspired by tsodings [nob](https://github.com/tsoding/nobuild) in name and idea.
 // noob.c
 #include "noob.h"
 
-#define NAME "fallingsand"
+#define NAME "test"
 
 int main(int argc, const char **argv) {
   noob_rebuild_yourself(argc, argv);
