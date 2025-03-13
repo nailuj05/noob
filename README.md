@@ -8,15 +8,19 @@ inspired by tsodings [nob](https://github.com/tsoding/nobuild) in name and idea.
 // noob.c
 #include "noob.h"
 
-int main(int argc, const char * argv) {
-  noob_rebuild_yourself(argc, argv);
-  
-  noob_cmd *bc = noob_string_create(128);
-  // do all your build logic here
-  noob_string_append(bc, "gcc main.c -o main");
-  noob_run_cmd(bc);
-  noob_string_free(bc);
+#define NAME "fallingsand"
 
+int main(int argc, const char **argv) {
+  noob_rebuild_yourself(argc, argv);
+
+	noob_ensure_dir("builds");
+	if (noob_is_outdated(NAME".c", "builds/"NAME))
+		 noob_run("cc "NAME".c -Iinclude -lraylib -lGL -lm -lpthread"
+							" -ldl -lrt -lX11 -o builds/"NAME);
+
+	if (noob_has_flag(argc, argv, "-r"))
+		noob_run("./builds/"NAME);
+	
   return 0;
 }
 ```
