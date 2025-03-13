@@ -7,15 +7,15 @@ int main(int argc, const char **argv) {
     printf("debug build\n");
   }
 
-  noob_cmd *bc = noob_create_build_cmd(12);
-  noob_add_cmd(bc, "echo");
-  noob_add_cmd(bc, "\"hey noob, this is where you would construct your build cmds\"");
+  noob_string *bc = noob_string_create(12);
+  noob_string_append(bc, "echo ");
+  noob_string_append(bc, "\"hey noob, this is where you would construct your build cmds\"");
 	
   void *t = noob_run_cmd_async(bc);
-
+	
 	noob_join_async(t);
 
-  noob_free_cmd(bc);
+  noob_string_free(bc);
 
   return 0;
 }
