@@ -9,7 +9,7 @@ sdir=$(dirname $0)
 cdir=$(pwd)
 noobh="noob.h"
 
-if [[ -f "$sdir/$noob" ]]; then
+if [[ -f "$sdir/$noobh" ]]; then
 		cp "$sdir/$noobh" "$cdir/$noobh"
 		echo "updated noob.h in $cdir"
 else

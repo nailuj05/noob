@@ -10,7 +10,7 @@ cdir=$(pwd)
 noobh="noob.h"
 noobc="noob.c"
 
-if [[ -f "$sdir/$noob" ]]; then
+if [[ -f "$sdir/$noobh" ]]; then
 		cp "$sdir/$noobh" "$cdir/$noobh"
 		cp "$sdir/$noobc" "$cdir/$noobc"
 		echo "added noob to $cdir"
