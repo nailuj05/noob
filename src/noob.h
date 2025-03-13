@@ -135,7 +135,7 @@ void noob_string_free(noob_string *bc) {
   }
 }
 
-int noob_build_n_run(const char *cmd) {
+int noob_run(const char *cmd) {
   int result = system(cmd);
 
   if (result == 0) {

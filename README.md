@@ -81,5 +81,5 @@ starts a command in a seperate thread. returns said thread.
 **noob_join_async()**
 joins an async thread and joins it, also frees the command that was run.
 
-**noob_build_n_run()**
+**noob_run()**
 just runs the command you give it. no overhead with a `noob_string`.
