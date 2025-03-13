@@ -50,6 +50,7 @@ void noob_string_append(noob_string *str, const char *astr) {
   }
 	
   strcat(str->buf, astr);
+	strcat(str->buf, " ");
 }
 
 noob_string *noob_string_create_from(const char* init) {

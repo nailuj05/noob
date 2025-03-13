@@ -42,7 +42,7 @@ any changes made to the noob.c file will automatically be build and then execute
 to make life a bit easier when constructing your build i also implemented functions that might help you do just that.
 
 **noob_string**
-is a struct to easily build and append to strings (for building commands). use `noob_string_create(int)` to create a buffer with a initial size. you can append using `noob_string_append(noob_string*, const char*)` and the buffer will automatically resize. 
+is a struct to easily build and append to strings (for building commands). use `noob_string_create(int)` to create a buffer with a initial size. you can append using `noob_string_append(noob_string*, const char*)` and the buffer will automatically resize, appending will also add a space between the strings. 
 free your strings using `noob_string_free(noob_string*)`.
 
 ```C
