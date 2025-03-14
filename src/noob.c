@@ -3,7 +3,7 @@
 int main(int argc, const char **argv) {
   noob_rebuild_yourself(argc, argv);
 
-	if (noob_help(argc, argv, "usage: ./noob", "-d : debug build", "-h : help", NULL))
+	if (noob_help(argc, argv, "usage: ./noob", "-d : debug build", "-h : help"))
 		exit(0);
 	
   if (noob_has_flag(argc, argv, "-d")) {

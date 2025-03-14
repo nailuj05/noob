@@ -8,7 +8,9 @@
 #include <string.h>
 #include <sys/stat.h>
 
-// utils
+// --------- //
+//   utils   //
+// --------- //
 
 typedef struct noob_string_s {
   char *buf;
@@ -68,7 +70,12 @@ int noob_has_flag(int argc, const char **argv, const char *flag) {
   return 0;
 }
 
-int noob_help(int ac, const char* av[], const char* first, ...) {
+// Calculate the number of varargs so we dont overflow and dont need a NULL as the last arg
+#define COUNT_ARGS(...)  (sizeof((const char*[]){__VA_ARGS__}) / sizeof(const char*))
+#define noob_help(ac, av, ...) \
+    noob_help_impl(ac, av, COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+
+int noob_help_impl(int ac, const char* av[], int c, const char* first, ...) {
 	if (noob_has_flag(ac,av,"-h") ||
 			noob_has_flag(ac,av,"--help") ||
 			noob_has_flag(ac,av,"help")) {
@@ -76,10 +83,10 @@ int noob_help(int ac, const char* av[], const char* first, ...) {
 		printf("[help] usage and information for this noob build system.\n");
 
 		va_list args;
-		const char* line;
 		va_start(args, first);
-		while((line = va_arg(args, const char*)) != NULL) {
-				printf("\t%s\n", line);
+		for(int i = 0; i < c; ++i) {
+			printf("\t%s\n", first);
+			first = va_arg(args, const char*);
 		}
 		va_end(args);
 
@@ -97,7 +104,9 @@ void noob_ensure_dir(const char *path) {
   }
 }
 
-// build system
+// ------------ //
+// build system //
+// ------------ //
 
 int noob_run_cmd(noob_string *bc) {
   printf("[cmd] %s\n", bc->buf);
