@@ -3,6 +3,7 @@
 
 #include <pthread.h>
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/stat.h>
@@ -65,6 +66,26 @@ int noob_has_flag(int argc, const char **argv, const char *flag) {
       return 1;
   }
   return 0;
+}
+
+int noob_help(int ac, const char* av[], const char* first, ...) {
+	if (noob_has_flag(ac,av,"-h") ||
+			noob_has_flag(ac,av,"--help") ||
+			noob_has_flag(ac,av,"help")) {
+		
+		printf("[help] usage and information for this noob build system.\n");
+
+		va_list args;
+		const char* line;
+		va_start(args, first);
+		while((line = va_arg(args, const char*)) != NULL) {
+				printf("\t%s\n", line);
+		}
+		va_end(args);
+
+		return 1;
+	}
+	return 0;
 }
 
 void noob_ensure_dir(const char *path) {
