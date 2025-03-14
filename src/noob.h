@@ -6,6 +6,8 @@
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
+#include <libgen.h>
+#include <unistd.h>
 #include <sys/stat.h>
 
 // --------- //
@@ -53,7 +55,6 @@ void noob_string_append(noob_string *str, const char *astr) {
   }
 	
   strcat(str->buf, astr);
-	strcat(str->buf, " ");
 }
 
 noob_string *noob_string_create_from(const char* init) {
@@ -73,9 +74,9 @@ int noob_has_flag(int argc, const char **argv, const char *flag) {
 // Calculate the number of varargs so we dont overflow and dont need a NULL as the last arg
 #define COUNT_ARGS(...)  (sizeof((const char*[]){__VA_ARGS__}) / sizeof(const char*))
 #define noob_help(ac, av, ...) \
-    noob_help_impl(ac, av, COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
+    _noob_help(ac, av, COUNT_ARGS(__VA_ARGS__), __VA_ARGS__)
 
-int noob_help_impl(int ac, const char* av[], int c, const char* first, ...) {
+int _noob_help(int ac, const char* av[], int c, const char* first, ...) {
 	if (noob_has_flag(ac,av,"-h") ||
 			noob_has_flag(ac,av,"--help") ||
 			noob_has_flag(ac,av,"help")) {
@@ -121,7 +122,7 @@ int noob_run_cmd(noob_string *bc) {
   }
 }
 
-void *noob_run_cmd_v(void *p) {
+void *_noob_run_cmd(void *p) {
   noob_string *bc = (noob_string *)p;
 
   printf("[cmd] %s\n", bc->buf);
@@ -143,7 +144,7 @@ void *noob_run_cmd_async(noob_string *bc) {
     exit(1);
   }
 
-  int res = pthread_create(t, NULL, noob_run_cmd_v, bc);
+  int res = pthread_create(t, NULL, _noob_run_cmd, bc);
 
   if (res != 0) {
     printf("[err] thread error encountered with code %d\n", res);
@@ -177,7 +178,35 @@ int noob_run(const char *cmd) {
   }
 }
 
-// RebuildYourself
+// ---------------- //
+// rebuild yourself //
+// ---------------- //
+
+char *_noob_realpath(const char *path) {
+	char *rpath = malloc(1024);
+  
+	if (realpath(path, rpath) == NULL) {
+		printf("[err] realpath failed\n");
+		exit(1);
+	}
+
+	return rpath;
+}
+
+char *_noob_set_wdir(const char *argv0) {
+	char *path = _noob_realpath(argv0);
+	char *rpath = malloc(1024);
+	strcpy(rpath, path);
+	char *dir = dirname(path);
+
+	if (chdir(dir) != 0) {
+		perror("[err] chdir failed\n");
+		exit(1);
+	}
+
+	free(path);
+	return rpath;
+}
 
 int noob_get_last_modified(const char *filepath) {
   struct stat file_stat;
@@ -196,7 +225,7 @@ int noob_is_outdated(const char *file_a, const char *file_b) {
   return 0;
 }
 
-int noob_recomp() {
+int _noob_recomp() {
   char cmd[256];
 
   if ((system("cc -fsyntax-only noob.c noob.h")) != 0) {
@@ -223,18 +252,24 @@ int noob_recomp() {
 }
 
 void noob_rebuild_yourself(int argc, const char **argv) {
+	char *rpath = _noob_set_wdir(argv[0]);
+	
   if (noob_is_outdated("noob.c", "noob") ||
       noob_is_outdated("noob.h", "noob")) {
     printf("[info] rebuilding...\n");
-    if (noob_recomp() == 0) {
+    if (_noob_recomp() == 0) {
       noob_string *bc = noob_string_create(128);
 
-      for (int i = 0; i < argc; i++)
+			noob_string_append(bc, rpath);
+      for (int i = 1; i < argc; i++) {
         noob_string_append(bc, argv[i]);
+				noob_string_append(bc, " ");
+			}
 
       noob_run_cmd(bc);
 
       noob_string_free(bc);
+			free(rpath);
       exit(0);
     }
     exit(1);
