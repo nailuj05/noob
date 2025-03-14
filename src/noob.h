@@ -39,19 +39,18 @@ noob_string *noob_string_create(size_t length) {
 }
 
 void noob_string_append(noob_string *str, const char *astr) {
-  size_t alen = strlen(astr);
-  size_t blen = strlen(str->buf);
+  size_t alen = astr ? strlen(astr) : 0;
+  size_t blen = str->buf ? strlen(str->buf) : 0;
 
-  if (alen + blen + 1 > str->length) {
-    size_t new_size = (alen + blen) * 2;
+  if (alen + blen > str->length) {
+		size_t new_size = (alen + blen) * 2;
     char *t = realloc(str->buf, new_size);
-		//printf("[internal] realloced\n");
-    if (t) {
-      str->buf = t;
-    } else {
-      printf("[err] buy more ram\n");
-      exit(1);
+    if (!t) {
+        printf("[err] buy more ram\n");
+        exit(1);
     }
+    str->buf = t;
+    str->length = new_size;
   }
 	
   strcat(str->buf, astr);
@@ -261,6 +260,7 @@ void noob_rebuild_yourself(int argc, const char **argv) {
       noob_string *bc = noob_string_create(128);
 
 			noob_string_append(bc, rpath);
+			free(rpath);
       for (int i = 1; i < argc; i++) {
         noob_string_append(bc, argv[i]);
 				noob_string_append(bc, " ");
@@ -269,7 +269,6 @@ void noob_rebuild_yourself(int argc, const char **argv) {
       noob_run_cmd(bc);
 
       noob_string_free(bc);
-			free(rpath);
       exit(0);
     }
     exit(1);
