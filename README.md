@@ -41,6 +41,8 @@ executing the build system will rebuild itself if needed, after a first compilat
 
 any changes made to the noob.c file will automatically be build and then executed, argc and argv are passed along aswell. 
 
+noob will also always change its working directory to the dir its executable lies in, this allows for relative paths to work, even when calling noob from another directory.
+
 ## documentation
 
 to make life a bit easier when constructing your build i also implemented functions that might help you do just that.
@@ -77,13 +79,25 @@ int main(int argc, const char **argv) {
 ```
 
 **noob_is_outdated(a, b)**
+
 checks whether file b is older than file a.
 
 **noob_run_cmd_async()**
+
 starts a command in a seperate thread. returns said thread.
 
 **noob_join_async()**
+
 joins an async thread and joins it, also frees the command that was run.
 
 **noob_run()**
+
 just runs the command you give it. no overhead with a `noob_string`.
+
+**noob_help(argc, argv, help...)**
+
+quick way of getting a help page up and running, every help string you pass in will be formatted 
+and output when `-h`, `--help` or `help` is a flag given in argv.
+
+
+all functions prefixed with a `_` are internal functions. 
