@@ -65,7 +65,7 @@ noob_string *noob_string_create_from(const char* init) {
 int noob_has_flag(int argc, const char **argv, const char *flag) {
   for (int i = 0; i < argc; i++) {
     if (strcmp(argv[i], flag) == 0)
-      return 1;
+      return i;
   }
   return 0;
 }
@@ -167,6 +167,7 @@ void noob_string_free(noob_string *bc) {
 }
 
 int noob_run(const char *cmd) {
+  printf("[cmd] %s\n", cmd);
   int result = system(cmd);
 
   if (result == 0) {
