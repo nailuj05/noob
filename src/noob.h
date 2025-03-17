@@ -263,8 +263,8 @@ void noob_rebuild_yourself(int argc, const char **argv) {
 			noob_string_append(bc, rpath);
 			free(rpath);
       for (int i = 1; i < argc; i++) {
-        noob_string_append(bc, argv[i]);
 				noob_string_append(bc, " ");
+        noob_string_append(bc, argv[i]);
 			}
 
       noob_run_cmd(bc);
