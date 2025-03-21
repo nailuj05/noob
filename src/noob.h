@@ -16,50 +16,81 @@
 
 typedef struct noob_string_s {
   char *buf;
-  size_t length;
+  size_t capacity;
 } noob_string;
 
 noob_string *noob_string_create(size_t length) {
+	if (length == 0) length = 64;
   noob_string *bc = (noob_string *)malloc(sizeof(noob_string));
   if (bc == NULL) {
     printf("[err] buy more ram\n");
     exit(1);
   }
 
-  bc->buf = (char *)malloc(sizeof(char) * length);
+  bc->buf = (char *)calloc(length + 1, 1);
 
   if (bc->buf == NULL) {
     printf("[err] buy more ram\n");
     exit(1);
   }
 
-  bc->length = length;
+  bc->capacity = length;
 
   return bc;
 }
 
-void noob_string_append(noob_string *str, const char *astr) {
-  size_t alen = astr ? strlen(astr) : 0;
-  size_t blen = str->buf ? strlen(str->buf) : 0;
-
-  if (alen + blen > str->length) {
-		size_t new_size = (alen + blen) * 2;
-    char *t = realloc(str->buf, new_size);
-    if (!t) {
+void noob_string_fit(noob_string *str, size_t blen) {
+	size_t alen = str ? strlen(str->buf) : 0;
+	
+  if (alen + blen > str->capacity) {
+		size_t new_capacity = alen > blen ? alen * 2 : (alen + blen) * 2;
+    char *t = realloc(str->buf, new_capacity + 1);
+		
+    if (t == NULL) {
         printf("[err] buy more ram\n");
         exit(1);
     }
+
     str->buf = t;
-    str->length = new_size;
+    str->capacity = new_capacity;
   }
+}
+
+void noob_string_append(noob_string *str, const char *astr) {
+  size_t blen = astr ? strlen(astr) : 0;
+
+	noob_string_fit(str, blen);
 	
   strcat(str->buf, astr);
 }
 
 noob_string *noob_string_create_from(const char* init) {
-	noob_string* s = noob_string_create(strlen(init));
+	noob_string* s = noob_string_create(strlen(init) + 1);
 	noob_string_append(s, init);
 	return s;
+}
+
+int noob_string_replace(noob_string *str, char *replace, char *with) {
+	size_t replace_l = strlen(replace);
+	size_t with_l = strlen(with);
+
+	noob_string_fit(str, with_l);
+
+	// search string, copy rest, replace string with replacement, concat rest
+	char *p = strstr(str->buf, replace);
+ 	if (p != NULL) {
+		size_t rest_l = strlen(p + replace_l);
+		char *rest = (char *)malloc(rest_l + 1);
+
+		memcpy(rest, p + replace_l, rest_l+1);
+		*p = '\0';
+		strcat(str->buf, with);
+		strcat(str->buf, rest);
+		
+		free(rest);
+		return 1;
+	}
+	return 0;
 }
 
 int noob_has_flag(int argc, const char **argv, const char *flag) {
@@ -68,6 +99,45 @@ int noob_has_flag(int argc, const char **argv, const char *flag) {
       return i;
   }
   return 0;
+}
+
+noob_string *noob_file_read(const char *filename) {
+	FILE *file = fopen(filename, "rb");
+	if (!file) {
+		printf("[err] failed to open file\n");
+		exit(1);
+	}
+
+	
+	fseek(file, 0, SEEK_END);
+	size_t length = (size_t)ftell(file);
+	rewind(file);
+
+	noob_string *f = noob_string_create(length);
+	fread(f->buf, 1, length, file);
+	f->buf[length] = '\0';
+	
+	fclose(file);
+	return f;
+}
+
+int noob_file_write(const char *filename, const char *content) {
+    FILE *file = fopen(filename, "w");
+    if (!file) {
+        printf("[err] failed to open file\n");
+        exit(1);
+    }
+
+    size_t length = fwrite(content, sizeof(char), strlen(content), file);
+    if (length < strlen(content)) {
+			printf("[err] failed to write file %s\n", filename);
+        fclose(file);
+        exit(1);
+    }
+
+		printf("[info] file %s written\n", filename);
+    fclose(file);
+    return 0;
 }
 
 // Calculate the number of varargs so we dont overflow and dont need a NULL as the last arg

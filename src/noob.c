@@ -12,7 +12,9 @@ int main(int argc, const char **argv) {
 
   noob_string *bc = noob_string_create(12);
   noob_string_append(bc, "echo ");
-  noob_string_append(bc, "\"hey noob, this is where you would construct your build cmds\"");
+  noob_string_append(bc, "\"hey {}, this is where you would construct your build cmds\"");
+
+	noob_string_replace(bc, "{}", "noob");
 	
   void *t = noob_run_cmd_async(bc);
 	
